@@ -1,0 +1,52 @@
+Levantamento Requisito Gerenciamento de Tarefas.
+
+Identificação do Problema:
+
+Falta de organização semanal, e falta de digitalização de tarefas e objetivos.
+
+
+
+
+Definição do publico alvo:
+
+Pessoas que buscam uma forma de organizar suas tarefas e eventos semanais, de uma maneira rápida e de fácil acesso, seria focado em mobile mas tmb em desktop.
+
+
+Listagem de Funcionalidades:
+
+- Login e cadastro de usuário.
+
+- esquecimento de senha.
+
+- criação de perfil de usuário, como uma inserção de apelido e foto.
+
+- mostragem de 7 blocos onde cada um seria o dia da semana, onde taria em cima de cada um o dia em especifico e a data que corresponderia a aquele dia. Dentro de cada bloco você poderia adicionar uma nova tarefa, onde ao clicar em um símbolo de mais, uma nova nota seria adicionada, onde você digitaria o titulo da nota, a hora que aquela nota vai ser lembrada a ele, oque seria feito em detalhes, e o seu status: Agendado, Pendente e Conluido. Ao criar a nota o status so poderia ser colocado como agendado, caso a nota seja inserida em um bloco de dia futuro. ao chegar ao dia, o usuário poderia colocar como conlcuido, caso o dia passe e o usuário não faça nada,  status vai passar a ficar pendente.
+
+- Caso chegue ao dia da nota agendada, o aplicativo vai emitir uma notificação para o usuário lembrando daquela nota em especifica, caso o usuário não tenha colocado uma hora em especifica para a notificação apitar, a notificação das notas vão ser as 08:00 da manha.
+
+- Um poco acima desses blocos vai estar um texo dizendo o mês atual e o ano.
+
+- Abaixo de todas as notas teria um ícone de calendário, onde ao clicar, um calendário do mês atual e ano abriria, e você poderia clicar em alguma data e adicionar tarefas em dias futuros q não estão na semana atual, a forma de adicionar notas seria a mesma, e a aquela semana q você escolheu a data futura chegar, a nota já estaria nos blocos pq você adicionou antes.
+
+- No calendário também vai aparecer as notas das ultimas duas semanas, depois vai ser excluídas.
+
+- Vai ter uma barra lateral onde vai ser aberta após ser apertada com um ícone, onde na barra vai ter a foto, o apelido, e as opções de ir para configurações e trocar de temas.
+
+- configurações: vai ter a opção de cadastrar um login e escolher por quantas semanas atras vai ficar mostrando as notas passadas.
+
+- cadastro de login vai ser ele escolhendo uma senha. depois q ele escolher, toda vez q ele estiver fora do app por mais de 10 minutos vai pedir a senha q ele cadastrou, q vai estar atrelado ao seu apelido. Tmb vai pedir pra cadastrar uma pergunta de segurança, onde ele vai digitar uma pergunta pessoal e escrever a resposta, e se caso a pessoa errar o login por mais de cinco vezes, vai perguntar a pergunta q ele cadastrou e se acertar com q a resposta q ele cadastrou ele entra, caso erre, o aplicativo barra as tentativas de senha por 15 minutos.
+
+
+Escolha de Tecnologias:
+Linguagem de programação: Flutter no front e Spring no back.
+
+Ambiente de Desenvolvimento:
+VsCode.
+
+Banco de dados:
+Mysql.
+
+Modelagem de Dados:
+
+
+
