@@ -4,11 +4,10 @@
 erDiagram
     USUARIO {
         int id_usuario PK
-        string email
+        string apelido
         string senha
         string pergunta_seguranca
         string resposta_seguranca
-        string apelido
         string foto_perfil
     }
     CONFIGURACAO {
