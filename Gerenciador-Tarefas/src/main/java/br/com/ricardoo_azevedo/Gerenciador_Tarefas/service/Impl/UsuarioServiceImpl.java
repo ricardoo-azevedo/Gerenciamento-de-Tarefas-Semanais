@@ -4,7 +4,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +19,7 @@ import br.com.ricardoo_azevedo.Gerenciador_Tarefas.dtos.UsuarioRecordDto;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.models.Usuario;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.repository.UsuarioRepository;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.service.interfaces.UsuarioServiceInterface;
+import jakarta.transaction.Transactional;
 
 
 
@@ -62,19 +67,43 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
     }
 
     
-
+    
     @Override
-    public UsuarioRecordDto update(UsuarioRecordDto usuarioRecordDto) {
+    @Transactional
+    public UsuarioRecordDto update(UsuarioRecordDto usuarioRecordDto, String apelidoAntigo) {
         /* validacoes futuras */
+        Usuario usuario = usuarioRepository.findByApelidoNative(apelidoAntigo).orElseThrow(); //validar mais tarde
 
-        //preciso arrumar um jeito de pegar o id pra usar no update aqui
-        // findById(usuarioRecordDto.)
+        usuario.setApelido(usuarioRecordDto.apelido());
+        usuario.setSenha(usuarioRecordDto.senha());
+        usuario.setPergunta_seguranca(usuarioRecordDto.pergunta_seguranca());
+        usuario.setResposta_seguranca(usuarioRecordDto.resposta_seguranca());
+        usuario.setFoto_perfil(usuarioRecordDto.foto_perfil());
+
+        usuarioRepository.save(usuario);
+
+       return new UsuarioRecordDto(
+        usuario.getApelido(), 
+        usuario.getSenha(), 
+        usuario.getPergunta_seguranca(), 
+        usuario.getResposta_seguranca(), 
+        usuario.getFoto_perfil()
+        );
+        
     }
 
     @Override
     public List<UsuarioRecordDto> findAll() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
+        List<Usuario> usuarios = usuarioRepository.findAll();
+        //validacoes
+        return usuarios.stream()
+        .map(usuario -> new UsuarioRecordDto(
+            usuario.getApelido(), 
+            usuario.getSenha(), 
+            usuario.getPergunta_seguranca(), 
+            usuario.getResposta_seguranca(), 
+            usuario.getFoto_perfil()))
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -82,7 +111,8 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
         /*validacoes futuras pra eu não esquecer */
 
         return usuarioRepository.findById(id)
-        .map(usuario -> new UsuarioRecordDto(usuario.getApelido(), 
+        .map(usuario -> new UsuarioRecordDto(
+        usuario.getApelido(), 
         usuario.getSenha(), 
         usuario.getPergunta_seguranca(), 
         usuario.getResposta_seguranca(), 
@@ -92,14 +122,31 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
 
     @Override
     public void deleteById(long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteById'");
+        //validacoes futuras
+
+        usuarioRepository.deleteById(id);
     }
 
     @Override
     public boolean existsByApelido(String apelido) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'existsByApelido'");
+        /*validacoes futuras */
+        return usuarioRepository.existsByApelido(apelido);
+    }
+
+
+
+    @Override
+    public UsuarioRecordDto findByApelido(String apelido) {
+        /* validações fuuras */
+        return usuarioRepository.findByApelidoNative(apelido)
+        .map(usuario -> new UsuarioRecordDto(
+            apelido, 
+            usuario.getSenha(), 
+            usuario.getPergunta_seguranca(), 
+            usuario.getResposta_seguranca(), 
+            usuario.getFoto_perfil()
+        )).orElseThrow(); //validar  mais tarde
+        
     }
 
 }
