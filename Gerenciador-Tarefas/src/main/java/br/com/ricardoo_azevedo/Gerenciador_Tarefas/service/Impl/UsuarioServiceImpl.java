@@ -16,6 +16,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.dtos.UsuarioRecordDto;
+import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.ApelidoExistenteException;
+import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.ApelidoNullException;
+import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.CaminhoImagemNullException;
+import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.DiretorioNaoCriadoException;
+import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.ImagemNaoSalvaException;
+import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.SenhaCurtaException;
+import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.UsuarioNaoAchadoException;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.models.Usuario;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.repository.UsuarioRepository;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.service.interfaces.UsuarioServiceInterface;
@@ -35,12 +42,16 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
     @Override
     public UsuarioRecordDto save(UsuarioRecordDto usuarioRecordDto, MultipartFile arquivo) {
         /* faze as validação mais tarde */
+    
         Path uploadImagemPath = Paths.get(uploadImagemDir);
+        if(uploadImagemPath == null){
+            throw new CaminhoImagemNullException();
+        }
         if (!Files.exists(uploadImagemPath)) {
             try {
                 Files.createDirectories(uploadImagemPath);
             } catch (IOException e) {
-                throw new RuntimeException("[Erro ao criar diretório para salvar imagens: "+e.getMessage()+"]");
+                throw new DiretorioNaoCriadoException(e.getMessage());
             }
         }
         String fileNome = usuarioRecordDto.apelido() + "_" + System.currentTimeMillis() + ".png";
@@ -48,7 +59,7 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
         try {
             arquivo.transferTo(filePath);
         } catch (IOException e) {
-            throw new RuntimeException("[Erro ao salvar a imagem no servidor: "+e.getMessage()+"]");
+            throw new ImagemNaoSalvaException(e.getMessage());
         }
         Usuario usuario = new Usuario();
         usuario.setApelido(usuarioRecordDto.apelido());
@@ -56,6 +67,14 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
         usuario.setPergunta_seguranca(usuarioRecordDto.pergunta_seguranca());
         usuario.setResposta_seguranca(usuarioRecordDto.resposta_seguranca());
         usuario.setFoto_perfil(fileNome);
+
+        
+        if(!usuarioRepository.existsByApelido(usuario.getApelido())){
+            throw new ApelidoExistenteException();
+        }
+        if(usuario.getSenha().length() < 8){
+            throw new SenhaCurtaException();
+        }
         Usuario usuarioSalvo = usuarioRepository.save(usuario); 
         return new UsuarioRecordDto(
             usuarioSalvo.getApelido(),
@@ -71,15 +90,22 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
     @Override
     @Transactional
     public UsuarioRecordDto update(UsuarioRecordDto usuarioRecordDto, String apelidoAntigo) {
-        /* validacoes futuras */
-        Usuario usuario = usuarioRepository.findByApelidoNative(apelidoAntigo).orElseThrow(); //validar mais tarde
 
+        if(apelidoAntigo == null){
+            throw new ApelidoNullException();
+        }
+        Usuario usuario = usuarioRepository.findByApelidoNative(apelidoAntigo).orElseThrow(() -> new UsuarioNaoAchadoException()); 
         usuario.setApelido(usuarioRecordDto.apelido());
         usuario.setSenha(usuarioRecordDto.senha());
         usuario.setPergunta_seguranca(usuarioRecordDto.pergunta_seguranca());
         usuario.setResposta_seguranca(usuarioRecordDto.resposta_seguranca());
         usuario.setFoto_perfil(usuarioRecordDto.foto_perfil());
-
+        if(!usuarioRepository.existsByApelido(usuario.getApelido())){
+            throw new ApelidoExistenteException();
+        }
+        if(usuario.getSenha().length() < 8){
+            throw new SenhaCurtaException();
+        }
         usuarioRepository.save(usuario);
 
        return new UsuarioRecordDto(
