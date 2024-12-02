@@ -1,4 +1,4 @@
-package br.com.ricardoo_azevedo.Gerenciador_Tarefas.service.serviceImpl;
+package br.com.ricardoo_azevedo.Gerenciador_Tarefas.service.Impl;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,56 +8,51 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.dtos.UsuarioRecordDto;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.models.Usuario;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.repository.UsuarioRepository;
-import br.com.ricardoo_azevedo.Gerenciador_Tarefas.service.UsuarioService;
+import br.com.ricardoo_azevedo.Gerenciador_Tarefas.service.interfaces.UsuarioServiceInterface;
 
-public class UsuarioServiceImpl implements UsuarioService {
+
+
+@Service
+public class UsuarioServiceImpl implements UsuarioServiceInterface {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
 
     @Value("${image.upload.dir}")
-    private String uploadImageDir;
+    private String uploadImagemDir;
 
     @Override
     public UsuarioRecordDto save(UsuarioRecordDto usuarioRecordDto, MultipartFile arquivo) {
-        /* futuras validações */
-        Path uploadImagePath = Paths.get(uploadImageDir);
-        if (!Files.exists(uploadImagePath)) {
+        /* faze as validação mais tarde */
+        Path uploadImagemPath = Paths.get(uploadImagemDir);
+        if (!Files.exists(uploadImagemPath)) {
             try {
-                Files.createDirectories(uploadImagePath);
+                Files.createDirectories(uploadImagemPath);
             } catch (IOException e) {
-                throw new RuntimeException("Erro ao criar diretório para salvar imagens.", e);
+                throw new RuntimeException("[Erro ao criar diretório para salvar imagens: "+e.getMessage()+"]");
             }
         }
-
-       
-        String fileName = usuarioRecordDto.apelido() + "_" + System.currentTimeMillis() + ".png";
-        Path filePath = uploadImagePath.resolve(fileName);
-
+        String fileNome = usuarioRecordDto.apelido() + "_" + System.currentTimeMillis() + ".png";
+        Path filePath = uploadImagemPath.resolve(fileNome);
         try {
             arquivo.transferTo(filePath);
         } catch (IOException e) {
-            throw new RuntimeException("Erro ao salvar a imagem no servidor.", e);
+            throw new RuntimeException("[Erro ao salvar a imagem no servidor: "+e.getMessage()+"]");
         }
-
-        
         Usuario usuario = new Usuario();
         usuario.setApelido(usuarioRecordDto.apelido());
         usuario.setSenha(usuarioRecordDto.senha());
         usuario.setPergunta_seguranca(usuarioRecordDto.pergunta_seguranca());
         usuario.setResposta_seguranca(usuarioRecordDto.resposta_seguranca());
-        usuario.setFoto_perfil(fileName);
-        
-       Usuario usuarioSalvo = usuarioRepository.save(usuario);
-
-        
+        usuario.setFoto_perfil(fileNome);
+        Usuario usuarioSalvo = usuarioRepository.save(usuario); 
         return new UsuarioRecordDto(
-            
             usuarioSalvo.getApelido(),
             usuarioSalvo.getSenha(),
             usuarioSalvo.getPergunta_seguranca(),
@@ -66,12 +61,14 @@ public class UsuarioServiceImpl implements UsuarioService {
         );
     }
 
-    }
+    
 
     @Override
     public UsuarioRecordDto update(UsuarioRecordDto usuarioRecordDto) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        /* validacoes futuras */
+
+        //preciso arrumar um jeito de pegar o id pra usar no update aqui
+        // findById(usuarioRecordDto.)
     }
 
     @Override
@@ -82,8 +79,15 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public UsuarioRecordDto findById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
+        /*validacoes futuras pra eu não esquecer */
+
+        return usuarioRepository.findById(id)
+        .map(usuario -> new UsuarioRecordDto(usuario.getApelido(), 
+        usuario.getSenha(), 
+        usuario.getPergunta_seguranca(), 
+        usuario.getResposta_seguranca(), 
+        usuario.getFoto_perfil()
+        )).orElseThrow(); //adiciona a validação aqui mais tarde
     }
 
     @Override

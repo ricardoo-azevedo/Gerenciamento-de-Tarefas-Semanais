@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.models.Usuario;
 
 @Repository
-public interface UsuarioRepository extends JpaRepository<Long, Usuario>{
+public interface UsuarioRepository extends JpaRepository<Usuario, Long>{
 
-    boolean existsByApelido(String apeplido);
+    boolean existsByApelido(String apelido);
 }

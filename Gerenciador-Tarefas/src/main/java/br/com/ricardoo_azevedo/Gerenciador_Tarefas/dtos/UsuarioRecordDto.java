@@ -25,7 +25,7 @@ public record UsuarioRecordDto(
     String resposta_seguranca,
     
     @NotBlank(message = "O Caminho deve ser obrigatorio!")
-    String foto_perfil,
+    String foto_perfil
     /* TENHO Q VER ESSA SITUAÇÂO DEPOIS
 
     @NotEmpty(message = "Deve incluir Todas as Tarefas relacionadas a usuario / esta vazio")

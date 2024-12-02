@@ -1,4 +1,4 @@
-package br.com.ricardoo_azevedo.Gerenciador_Tarefas.service;
+package br.com.ricardoo_azevedo.Gerenciador_Tarefas.service.interfaces;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.dtos.UsuarioRecordDto;
 
-public interface UsuarioService {
+public interface UsuarioServiceInterface {
 
     UsuarioRecordDto save(UsuarioRecordDto usuarioRecordDto, MultipartFile arquivo);
 
