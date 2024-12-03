@@ -10,7 +10,10 @@ import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.A
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.ApelidoNullException;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.CaminhoImagemNullException;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.DiretorioNaoCriadoException;
+import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.IdIncompativelException;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.ImagemNaoSalvaException;
+import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.ListaVaziaException;
+import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.ObjetoDtoNaoCriadoException;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.SenhaCurtaException;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.UsuarioNaoAchadoException;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.formater.RestErrorMessage;
@@ -58,5 +61,23 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler{
      private ResponseEntity<RestErrorMessage> UsuarioNaoAchadoException(UsuarioNaoAchadoException exception){
         RestErrorMessage response = new RestErrorMessage(HttpStatus.NOT_FOUND, exception.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+     }
+
+     @ExceptionHandler(ListaVaziaException.class)
+     private ResponseEntity<RestErrorMessage> ListaVaziaException(ListaVaziaException exception){
+         RestErrorMessage response = new RestErrorMessage(HttpStatus.NOT_FOUND, exception.getMessage());
+         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+     }
+
+     @ExceptionHandler(IdIncompativelException.class)
+     private ResponseEntity<RestErrorMessage> IdIncompativelException(IdIncompativelException exception){
+         RestErrorMessage response = new RestErrorMessage(HttpStatus.NOT_ACCEPTABLE, exception.getMessage());
+         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response);
+     }
+
+     @ExceptionHandler(ObjetoDtoNaoCriadoException.class)
+     private ResponseEntity<RestErrorMessage> ObjetoDtoNaoCriadoException(ObjetoDtoNaoCriadoException exception){
+         RestErrorMessage response = new RestErrorMessage(HttpStatus.CONFLICT, exception.getMessage());
+         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
      }
 }

@@ -20,7 +20,10 @@ import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.A
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.ApelidoNullException;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.CaminhoImagemNullException;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.DiretorioNaoCriadoException;
+import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.IdIncompativelException;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.ImagemNaoSalvaException;
+import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.ListaVaziaException;
+import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.ObjetoDtoNaoCriadoException;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.SenhaCurtaException;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.UsuarioNaoAchadoException;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.models.Usuario;
@@ -40,11 +43,9 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
     private String uploadImagemDir;
 
     @Override
-    public UsuarioRecordDto save(UsuarioRecordDto usuarioRecordDto, MultipartFile arquivo) {
-        /* faze as validação mais tarde */
-    
+    public UsuarioRecordDto save(UsuarioRecordDto usuarioRecordDto, MultipartFile arquivo) {    
         Path uploadImagemPath = Paths.get(uploadImagemDir);
-        if(uploadImagemPath == null){
+        if(uploadImagemDir == null || uploadImagemDir.isBlank()){
             throw new CaminhoImagemNullException();
         }
         if (!Files.exists(uploadImagemPath)) {
@@ -67,8 +68,9 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
         usuario.setPergunta_seguranca(usuarioRecordDto.pergunta_seguranca());
         usuario.setResposta_seguranca(usuarioRecordDto.resposta_seguranca());
         usuario.setFoto_perfil(fileNome);
-
-        
+        if(usuario.getApelido() == null){
+            throw new ApelidoNullException();
+        }
         if(!usuarioRepository.existsByApelido(usuario.getApelido())){
             throw new ApelidoExistenteException();
         }
@@ -89,10 +91,27 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
     
     @Override
     @Transactional
-    public UsuarioRecordDto update(UsuarioRecordDto usuarioRecordDto, String apelidoAntigo) {
-
+    public UsuarioRecordDto update(UsuarioRecordDto usuarioRecordDto, String apelidoAntigo, MultipartFile arquivo) {
         if(apelidoAntigo == null){
             throw new ApelidoNullException();
+        }
+        Path uploadImagemPath = Paths.get(uploadImagemDir);
+        if(uploadImagemDir == null || uploadImagemDir.isBlank()){
+            throw new CaminhoImagemNullException();
+        }
+        if (!Files.exists(uploadImagemPath)) {
+            try {
+                Files.createDirectories(uploadImagemPath);
+            } catch (IOException e) {
+                throw new DiretorioNaoCriadoException(e.getMessage());
+            }
+        }
+        String fileNome = usuarioRecordDto.apelido() + "_" + System.currentTimeMillis() + ".png";
+        Path filePath = uploadImagemPath.resolve(fileNome);
+        try {
+            arquivo.transferTo(filePath);
+        } catch (IOException e) {
+            throw new ImagemNaoSalvaException(e.getMessage());
         }
         Usuario usuario = usuarioRepository.findByApelidoNative(apelidoAntigo).orElseThrow(() -> new UsuarioNaoAchadoException()); 
         usuario.setApelido(usuarioRecordDto.apelido());
@@ -107,8 +126,7 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
             throw new SenhaCurtaException();
         }
         usuarioRepository.save(usuario);
-
-       return new UsuarioRecordDto(
+        return new UsuarioRecordDto(
         usuario.getApelido(), 
         usuario.getSenha(), 
         usuario.getPergunta_seguranca(), 
@@ -121,7 +139,9 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
     @Override
     public List<UsuarioRecordDto> findAll() {
         List<Usuario> usuarios = usuarioRepository.findAll();
-        //validacoes
+        if(usuarios.isEmpty()){
+            throw new ListaVaziaException();
+        }
         return usuarios.stream()
         .map(usuario -> new UsuarioRecordDto(
             usuario.getApelido(), 
@@ -134,8 +154,12 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
 
     @Override
     public UsuarioRecordDto findById(Long id) {
-        /*validacoes futuras pra eu não esquecer */
-
+        if(id == null){
+            throw new IdIncompativelException("O id esta Nulo!");
+        }
+        if(!(id instanceof Long)){
+            throw new IdIncompativelException("O tipo do Id não esta como esperado!");
+        }
         return usuarioRepository.findById(id)
         .map(usuario -> new UsuarioRecordDto(
         usuario.getApelido(), 
@@ -143,19 +167,25 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
         usuario.getPergunta_seguranca(), 
         usuario.getResposta_seguranca(), 
         usuario.getFoto_perfil()
-        )).orElseThrow(); //adiciona a validação aqui mais tarde
+        )).orElseThrow(() -> new ObjetoDtoNaoCriadoException("Metodo findById de usuario, não conseguiu transferir e retornar para dto!"));
     }
 
     @Override
-    public void deleteById(long id) {
-        //validacoes futuras
-
+    public void deleteById(Long id) {
+        if(id == null){
+            throw new IdIncompativelException("O id Esta Nulo!");
+        }
+        if(!(id instanceof Long)){
+            throw new IdIncompativelException("O tipo do Id não esta como Esperado!");
+        }
         usuarioRepository.deleteById(id);
     }
 
     @Override
     public boolean existsByApelido(String apelido) {
-        /*validacoes futuras */
+        if(apelido == null){
+            throw new ApelidoNullException();
+        }
         return usuarioRepository.existsByApelido(apelido);
     }
 
@@ -163,7 +193,9 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
 
     @Override
     public UsuarioRecordDto findByApelido(String apelido) {
-        /* validações fuuras */
+        if(apelido == null){
+            throw new ApelidoNullException();
+        }
         return usuarioRepository.findByApelidoNative(apelido)
         .map(usuario -> new UsuarioRecordDto(
             apelido, 
@@ -171,7 +203,7 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
             usuario.getPergunta_seguranca(), 
             usuario.getResposta_seguranca(), 
             usuario.getFoto_perfil()
-        )).orElseThrow(); //validar  mais tarde
+        )).orElseThrow(() -> new ObjetoDtoNaoCriadoException("O metodo findbyApelido de Usuario, não conseguiu transferir e nem retornar para dto!")); 
         
     }
 
