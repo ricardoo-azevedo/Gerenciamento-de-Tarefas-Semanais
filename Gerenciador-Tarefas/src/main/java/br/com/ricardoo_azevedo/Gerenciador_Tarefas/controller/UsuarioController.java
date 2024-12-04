@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,13 +29,13 @@ public class UsuarioController {
     private UsuarioServiceImpl usuarioServiceImpl;
 
     @PostMapping("/salvar")
-    public ResponseEntity<UsuarioRecordDto> salvar(@RequestPart("usuarioRecordDto") @Valid UsuarioRecordDto usuarioRecordDto, @RequestPart("arquivo") MultipartFile arquivo){
+    public ResponseEntity<UsuarioRecordDto> salvar(@ModelAttribute UsuarioRecordDto usuarioRecordDto, @RequestPart("arquivo") MultipartFile arquivo){
         UsuarioRecordDto usuarioRecordDtoSalvo =  usuarioServiceImpl.save(usuarioRecordDto, arquivo);
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioRecordDtoSalvo);    
     }
 
     @PatchMapping("/editar/{apelido}")
-    public ResponseEntity<UsuarioRecordDto> editar(@RequestPart("usuarioRecordDto") @Valid UsuarioRecordDto usuarioRecordDto, @PathVariable String apelido, @RequestPart("arquivo") MultipartFile arquivo){
+    public ResponseEntity<UsuarioRecordDto> editar(@ModelAttribute UsuarioRecordDto usuarioRecordDto, @PathVariable String apelido, @RequestPart("arquivo") MultipartFile arquivo){
         UsuarioRecordDto usuarioRecordDtoEditado = usuarioServiceImpl.update(usuarioRecordDto, apelido, arquivo);
         return ResponseEntity.status(HttpStatus.OK).body(usuarioRecordDtoEditado);
     }

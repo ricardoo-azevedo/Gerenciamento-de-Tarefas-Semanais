@@ -15,7 +15,10 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long>{
 
     boolean existsByApelido(String apelido);
 
-    @Query(value = "SELECT * FROM tb_usuario where apelido = :apelido", nativeQuery = true)
-    Optional<Usuario> findByApelidoNative(@Param("apelido") String apelido);
+    
+    
+
+    @Query(value = "SELECT u FROM Usuario u WHERE u.apelido = :apelido")
+    Usuario findByApelidoNative(@Param("apelido") String apelido);
 
 }

@@ -8,24 +8,31 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-public record UsuarioRecordDto(
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @ToString
+public class UsuarioRecordDto {
 
     @NotBlank(message = "O apelido é obrigatorio")
     @Size(min = 2, max = 200, message = "O campo deve ter o Minimo de 3 caracteres, ou maximo de 200!")
-    String apelido,
+    String apelido;
 
     @Size(min = 8, message = "O campo deve ter no minimo 8 digitos!")
-    String senha,
+    String senha;
 
     @Size(min = 2, max = 100, message = "O campo deve ser no minimo 2 maximo 100")
-    String pergunta_seguranca,
+    String pergunta_seguranca;
 
     @Size(min = 2, max = 100, message = "O campo deve ser no minimo 2 maximo 100")
-    String resposta_seguranca,
+    String resposta_seguranca;
     
-    @NotBlank(message = "O Caminho deve ser obrigatorio!")
-    String foto_perfil
+    @NotNull(message = "O caminho da foto do perfil não pode ser nulo.")
+    @Size(min = 1, message = "O foto do perfil não pode ser vazio.")
+    String foto_perfil;
     /* TENHO Q VER ESSA SITUAÇÂO DEPOIS
 
     @NotEmpty(message = "Deve incluir Todas as Tarefas relacionadas a usuario / esta vazio")
@@ -35,7 +42,8 @@ public record UsuarioRecordDto(
     Configuracao configuracao
     */
 
-) {
+
+    
 }
     
 

@@ -37,10 +37,10 @@ public class Usuario {
     @Column(name = "senha_usuario", nullable = true, unique = true, length = 30)
     private String senha;
 
-    @Column(name = "pergunta_seguranca_usuario", nullable = true, unique = true, length = 100)
+    @Column(name = "pergunta_seguranca_usuario", nullable = true, unique = false, length = 100)
     private String pergunta_seguranca;
 
-    @Column(name = "resposta_seguranca_usuario", nullable = true, unique = true, length = 100)
+    @Column(name = "resposta_seguranca_usuario", nullable = true, unique = false, length = 100)
     private String resposta_seguranca;
 
     @Column(name = "caminho_foto_perfil_usuario", nullable = true, unique = true, length = 150)

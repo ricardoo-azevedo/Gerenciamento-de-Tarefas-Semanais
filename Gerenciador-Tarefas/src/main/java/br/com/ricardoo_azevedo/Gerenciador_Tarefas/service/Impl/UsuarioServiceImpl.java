@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,23 +54,30 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
                 throw new DiretorioNaoCriadoException(e.getMessage());
             }
         }
-        String fileNome = usuarioRecordDto.apelido() + "_" + System.currentTimeMillis() + ".png";
+        String originalFileName = arquivo.getOriginalFilename();
+        String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy");        
+        String timestamp = LocalDateTime.now().format(formatter);
+        String fileNome = usuarioRecordDto.getApelido() + "_" + timestamp + fileExtension;
         Path filePath = uploadImagemPath.resolve(fileNome);
         try {
             arquivo.transferTo(filePath);
         } catch (IOException e) {
             throw new ImagemNaoSalvaException(e.getMessage());
         }
+
+
+
         Usuario usuario = new Usuario();
-        usuario.setApelido(usuarioRecordDto.apelido());
-        usuario.setSenha(usuarioRecordDto.senha());
-        usuario.setPergunta_seguranca(usuarioRecordDto.pergunta_seguranca());
-        usuario.setResposta_seguranca(usuarioRecordDto.resposta_seguranca());
+        usuario.setApelido(usuarioRecordDto.getApelido());
+        usuario.setSenha(usuarioRecordDto.getSenha());
+        usuario.setPergunta_seguranca(usuarioRecordDto.getPergunta_seguranca());
+        usuario.setResposta_seguranca(usuarioRecordDto.getResposta_seguranca());
         usuario.setFoto_perfil(fileNome);
         if(usuario.getApelido() == null){
             throw new ApelidoNullException();
         }
-        if(!usuarioRepository.existsByApelido(usuario.getApelido())){
+        if(usuarioRepository.existsByApelido(usuario.getApelido())){
             throw new ApelidoExistenteException();
         }
         if(usuario.getSenha().length() < 8){
@@ -102,21 +111,25 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
             } catch (IOException e) {
                 throw new DiretorioNaoCriadoException(e.getMessage());
             }
-        }
-        String fileNome = usuarioRecordDto.apelido() + "_" + System.currentTimeMillis() + ".png";
+        } 
+        String originalFileName = arquivo.getOriginalFilename();
+        String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy");        
+        String timestamp = LocalDateTime.now().format(formatter);
+        String fileNome = usuarioRecordDto.getApelido() + "_" + timestamp + fileExtension;
         Path filePath = uploadImagemPath.resolve(fileNome);
         try {
             arquivo.transferTo(filePath);
         } catch (IOException e) {
             throw new ImagemNaoSalvaException(e.getMessage());
         }
-        Usuario usuario = usuarioRepository.findByApelidoNative(apelidoAntigo).orElseThrow(() -> new UsuarioNaoAchadoException()); 
-        usuario.setApelido(usuarioRecordDto.apelido());
-        usuario.setSenha(usuarioRecordDto.senha());
-        usuario.setPergunta_seguranca(usuarioRecordDto.pergunta_seguranca());
-        usuario.setResposta_seguranca(usuarioRecordDto.resposta_seguranca());
-        usuario.setFoto_perfil(usuarioRecordDto.foto_perfil());
-        if(!usuarioRepository.existsByApelido(usuario.getApelido())){
+        Usuario usuario = usuarioRepository.findByApelidoNative(apelidoAntigo);
+        usuario.setApelido(usuarioRecordDto.getApelido());
+        usuario.setSenha(usuarioRecordDto.getSenha());
+        usuario.setPergunta_seguranca(usuarioRecordDto.getPergunta_seguranca());
+        usuario.setResposta_seguranca(usuarioRecordDto.getResposta_seguranca());
+        usuario.setFoto_perfil(usuarioRecordDto.getFoto_perfil());
+        if(usuarioRepository.existsByApelido(usuario.getApelido())){
             throw new ApelidoExistenteException();
         }
         if(usuario.getSenha().length() < 8){

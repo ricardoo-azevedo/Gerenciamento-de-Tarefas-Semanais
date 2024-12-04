@@ -51,7 +51,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler{
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response);
      }
 
-     @ExceptionHandler(ApelidoExistenteException.class)
+     @ExceptionHandler(ApelidoNullException.class)
      private ResponseEntity<RestErrorMessage> ApelidoNullException(ApelidoNullException exception){
         RestErrorMessage response = new RestErrorMessage(HttpStatus.NOT_ACCEPTABLE, exception.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response);
