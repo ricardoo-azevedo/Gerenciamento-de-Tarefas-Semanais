@@ -13,12 +13,10 @@ import br.com.ricardoo_azevedo.Gerenciador_Tarefas.models.Usuario;
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long>{
 
+    
     boolean existsByApelido(String apelido);
 
-    
-    
-
     @Query(value = "SELECT u FROM Usuario u WHERE u.apelido = :apelido")
-    Usuario findByApelidoNative(@Param("apelido") String apelido);
+    Optional<Usuario> findByApelidoNative(@Param("apelido") String apelido);
 
 }
