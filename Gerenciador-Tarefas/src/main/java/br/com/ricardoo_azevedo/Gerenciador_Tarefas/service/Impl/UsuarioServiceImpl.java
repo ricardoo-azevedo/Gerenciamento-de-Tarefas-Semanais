@@ -132,6 +132,7 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
         usuario.setSenha(usuarioRecordDto.getSenha());
         usuario.setPergunta_seguranca(usuarioRecordDto.getPergunta_seguranca());
         usuario.setResposta_seguranca(usuarioRecordDto.getResposta_seguranca());
+        usuario.setFoto_perfil(fileNome);
         Usuario usuarioSalvo = usuarioRepository.save(usuario);
         return new UsuarioRecordDto(
                 usuarioSalvo.getApelido(),
@@ -172,8 +173,7 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
                         usuario.getPergunta_seguranca(),
                         usuario.getResposta_seguranca(),
                         usuario.getFoto_perfil()))
-                .orElseThrow(() -> new ObjetoDtoNaoCriadoException(
-                        "Metodo findById de usuario, não conseguiu transferir e retornar para dto!"));
+                .orElseThrow(() -> new UsuarioNaoAchadoException());
     }
 
     @Override
@@ -183,6 +183,9 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
         }
         if (!(id instanceof Long)) {
             throw new IdIncompativelException("O tipo do Id não esta como Esperado!");
+        }
+        if(usuarioRepository.existsById(id) == false){
+            throw new UsuarioNaoAchadoException();
         }
         usuarioRepository.deleteById(id);
     }
@@ -207,8 +210,7 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
                         usuario.getPergunta_seguranca(),
                         usuario.getResposta_seguranca(),
                         usuario.getFoto_perfil()))
-                .orElseThrow(() -> new ObjetoDtoNaoCriadoException(
-                        "O metodo findbyApelido de Usuario, não conseguiu transferir e nem retornar para dto!"));
+                .orElseThrow(() -> new UsuarioNaoAchadoException());
 
     }
 

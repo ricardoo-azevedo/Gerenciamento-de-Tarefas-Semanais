@@ -35,24 +35,24 @@ public class UsuarioController {
     }
 
     @PostMapping("/editar/{apelidoAntigo}")
-    public ResponseEntity<UsuarioRecordDto> editar(@PathVariable String apelidoAntigo, @ModelAttribute UsuarioRecordDto usuarioRecordDto, @RequestPart("arquivo") MultipartFile arquivo) { // Recebe o arquivo separadamente
+    public ResponseEntity<UsuarioRecordDto> editar(@PathVariable String apelidoAntigo, @ModelAttribute UsuarioRecordDto usuarioRecordDto, @RequestParam MultipartFile arquivo) { // Recebe o arquivo separadamente
         UsuarioRecordDto usuarioRecordDtoEditado = usuarioServiceImpl.update(usuarioRecordDto, apelidoAntigo, arquivo);
         return ResponseEntity.status(HttpStatus.OK).body(usuarioRecordDtoEditado);
     }
 
-    @GetMapping("/listar")
+    @GetMapping("/")
     public ResponseEntity<List<UsuarioRecordDto>> listar() {
         List<UsuarioRecordDto> usuarios = usuarioServiceImpl.findAll();
         return ResponseEntity.ok(usuarios);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/buscar-id/{id}")
     public ResponseEntity<UsuarioRecordDto> buscarPorId(@PathVariable Long id) {
         UsuarioRecordDto usuarioRecordDto = usuarioServiceImpl.findById(id);
         return ResponseEntity.ok(usuarioRecordDto);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/deletar/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         usuarioServiceImpl.deleteById(id);
         return ResponseEntity.noContent().build();
@@ -64,7 +64,7 @@ public class UsuarioController {
         return ResponseEntity.ok(existe);
     }
 
-    @GetMapping("/{apelido}")
+    @GetMapping("/buscar-apelido/{apelido}")
     public ResponseEntity<UsuarioRecordDto> buscarPorApelido(@PathVariable String apelido) {
         UsuarioRecordDto usuarioRecordDto = usuarioServiceImpl.findByApelido(apelido);
         return ResponseEntity.ok(usuarioRecordDto);
