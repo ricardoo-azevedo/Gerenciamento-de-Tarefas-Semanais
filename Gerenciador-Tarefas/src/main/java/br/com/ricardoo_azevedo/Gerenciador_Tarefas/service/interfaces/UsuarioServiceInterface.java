@@ -9,7 +9,7 @@ import br.com.ricardoo_azevedo.Gerenciador_Tarefas.dtos.UsuarioRecordDto;
 
 public interface UsuarioServiceInterface {
 
-    UsuarioRecordDto save(UsuarioRecordDto usuarioRecordDto, MultipartFile arquivo);
+    UsuarioRecordDto save(UsuarioRecordDto usuarioRecordDto, MultipartFile arquivo, String fileNome);
 
     UsuarioRecordDto update(UsuarioRecordDto usuarioRecordDto, String apelidoAntigo, MultipartFile arquivo);
 
@@ -22,5 +22,7 @@ public interface UsuarioServiceInterface {
     boolean existsByApelido(String apelido);
 
     UsuarioRecordDto findByApelido(String apelido);
+
+    String saveImage(UsuarioRecordDto usuarioRecordDto, String uploadImadeDir, MultipartFile arquivo);
 
 }

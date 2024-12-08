@@ -3,6 +3,7 @@ package br.com.ricardoo_azevedo.Gerenciador_Tarefas.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,13 +25,16 @@ import br.com.ricardoo_azevedo.Gerenciador_Tarefas.service.Impl.UsuarioServiceIm
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
 
+    @Value("${image.upload.dir}")
+    private String uploadImagemDir;
+
     @Autowired
     private UsuarioServiceImpl usuarioServiceImpl;
 
     @PostMapping("/salvar")
     public ResponseEntity<UsuarioRecordDto> salvar(@ModelAttribute UsuarioRecordDto usuarioRecordDto,
             @RequestPart("arquivo") MultipartFile arquivo) {
-        UsuarioRecordDto usuarioRecordDtoSalvo = usuarioServiceImpl.save(usuarioRecordDto, arquivo);
+        UsuarioRecordDto usuarioRecordDtoSalvo = usuarioServiceImpl.save(usuarioRecordDto, arquivo, usuarioServiceImpl.saveImage(usuarioRecordDto, uploadImagemDir, arquivo));
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioRecordDtoSalvo);
     }
 

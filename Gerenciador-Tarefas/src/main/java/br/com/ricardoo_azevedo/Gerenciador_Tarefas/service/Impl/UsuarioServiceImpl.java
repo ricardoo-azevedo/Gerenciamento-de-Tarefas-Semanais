@@ -35,39 +35,47 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioServiceInterface {
-
+    
     @Autowired
     private UsuarioRepository usuarioRepository;
-
+    
     @Value("${image.upload.dir}")
     private String uploadImagemDir;
+    
+
 
     @Override
-    public UsuarioRecordDto save(UsuarioRecordDto usuarioRecordDto, MultipartFile arquivo) {
-        Path uploadImagemPath = Paths.get(uploadImagemDir);
-        if (uploadImagemDir == null || uploadImagemDir.isBlank()) {
+    public String saveImage(UsuarioRecordDto usuarioRecordDto, String uploadImadeDir, MultipartFile arquivo) {
+        Path uploadImagePath = Paths.get(uploadImadeDir);
+        if(uploadImadeDir == null || uploadImadeDir.isBlank()){
             throw new CaminhoImagemNullException();
         }
-        if (!Files.exists(uploadImagemPath)) {
+        if(!Files.exists(uploadImagePath)){
             try {
-                Files.createDirectories(uploadImagemPath);
+                Files.createDirectories(uploadImagePath);
             } catch (IOException e) {
-                throw new DiretorioNaoCriadoException(e.getMessage());
+                throw new DiretorioNaoCriadoException();
             }
         }
         String originalFileName = arquivo.getOriginalFilename();
-        String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy");
-        String timestamp = LocalDateTime.now().format(formatter);
-        String fileNome = usuarioRecordDto.getApelido() + "_" + timestamp + fileExtension;
-        Path filePath = uploadImagemPath.resolve(fileNome);
+        String extensao = originalFileName.substring(originalFileName.lastIndexOf("."));
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("ddMMyyyy");
+        String timestamp = LocalDateTime.now().format(formato);
+        String fileNome = usuarioRecordDto.getApelido() + "_" + timestamp + extensao;
+        Path filePath = uploadImagePath.resolve(fileNome);
         try {
             arquivo.transferTo(filePath);
+            return fileNome;
         } catch (IOException e) {
             throw new ImagemNaoSalvaException(e.getMessage());
+            
         }
+
+    }
+
+    @Override
+    public UsuarioRecordDto save(UsuarioRecordDto usuarioRecordDto, MultipartFile arquivo, String fileNome) {
         Usuario usuario = new Usuario();
-        ////validacoes:
         if (usuarioRepository.existsByApelido(usuarioRecordDto.getApelido())) {
             throw new ApelidoExistenteException();
         }
@@ -213,5 +221,6 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
                 .orElseThrow(() -> new UsuarioNaoAchadoException());
 
     }
+
 
 }
