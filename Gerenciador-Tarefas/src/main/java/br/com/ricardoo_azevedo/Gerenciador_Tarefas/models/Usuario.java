@@ -43,7 +43,7 @@ public class Usuario {
     @Column(name = "resposta_seguranca_usuario", nullable = true, unique = false, length = 100)
     private String resposta_seguranca;
 
-    @Column(name = "caminho_foto_perfil_usuario", nullable = true, unique = true, length = 150)
+    @Column(name = "foto_perfil_usuario", nullable = true, unique = true, length = 150, columnDefinition = "BLOB")
     private String foto_perfil;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
