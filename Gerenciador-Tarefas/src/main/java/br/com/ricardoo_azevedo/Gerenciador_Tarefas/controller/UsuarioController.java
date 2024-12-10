@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.dtos.UsuarioRecordDto;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.service.Impl.UsuarioServiceImpl;
 
+
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
@@ -34,17 +35,17 @@ public class UsuarioController {
     @PostMapping("/salvar")
     public ResponseEntity<UsuarioRecordDto> salvar(@ModelAttribute UsuarioRecordDto usuarioRecordDto,
             @RequestPart("arquivo") MultipartFile arquivo) {
-        UsuarioRecordDto usuarioRecordDtoSalvo = usuarioServiceImpl.save(usuarioRecordDto, arquivo, usuarioServiceImpl.saveImage(usuarioRecordDto, uploadImagemDir, arquivo));
+        UsuarioRecordDto usuarioRecordDtoSalvo = usuarioServiceImpl.save(usuarioRecordDto, usuarioServiceImpl.saveImage(usuarioRecordDto, uploadImagemDir, arquivo));
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioRecordDtoSalvo);
     }
 
     @PostMapping("/editar/{apelidoAntigo}")
-    public ResponseEntity<UsuarioRecordDto> editar(@PathVariable String apelidoAntigo, @ModelAttribute UsuarioRecordDto usuarioRecordDto, @RequestParam MultipartFile arquivo) { // Recebe o arquivo separadamente
-        UsuarioRecordDto usuarioRecordDtoEditado = usuarioServiceImpl.update(usuarioRecordDto, apelidoAntigo, arquivo);
+    public ResponseEntity<UsuarioRecordDto> editar(@PathVariable String apelidoAntigo, @ModelAttribute UsuarioRecordDto usuarioRecordDto, @RequestPart("arquivo") MultipartFile arquivo) {
+        UsuarioRecordDto usuarioRecordDtoEditado = usuarioServiceImpl.update(usuarioRecordDto, apelidoAntigo, usuarioServiceImpl.saveImage(usuarioRecordDto, apelidoAntigo, arquivo));
         return ResponseEntity.status(HttpStatus.OK).body(usuarioRecordDtoEditado);
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<List<UsuarioRecordDto>> listar() {
         List<UsuarioRecordDto> usuarios = usuarioServiceImpl.findAll();
         return ResponseEntity.ok(usuarios);

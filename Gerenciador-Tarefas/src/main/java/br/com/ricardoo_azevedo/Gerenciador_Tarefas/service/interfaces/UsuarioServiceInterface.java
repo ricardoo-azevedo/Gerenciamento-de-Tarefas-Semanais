@@ -9,9 +9,9 @@ import br.com.ricardoo_azevedo.Gerenciador_Tarefas.dtos.UsuarioRecordDto;
 
 public interface UsuarioServiceInterface {
 
-    UsuarioRecordDto save(UsuarioRecordDto usuarioRecordDto, MultipartFile arquivo, String fileNome);
+    UsuarioRecordDto save(UsuarioRecordDto usuarioRecordDto, String fileNome);
 
-    UsuarioRecordDto update(UsuarioRecordDto usuarioRecordDto, String apelidoAntigo, MultipartFile arquivo);
+    UsuarioRecordDto update(UsuarioRecordDto usuarioRecordDto, String apelidoAntigo, String fileNome);
 
     List<UsuarioRecordDto> findAll();
 

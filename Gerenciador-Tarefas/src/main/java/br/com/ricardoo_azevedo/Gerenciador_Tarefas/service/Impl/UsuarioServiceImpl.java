@@ -7,13 +7,12 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.management.RuntimeErrorException;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,7 +24,7 @@ import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.D
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.IdIncompativelException;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.ImagemNaoSalvaException;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.ListaVaziaException;
-import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.ObjetoDtoNaoCriadoException;
+
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.SenhaCurtaException;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.exceptionHandler.exceptions.UsuarioNaoAchadoException;
 import br.com.ricardoo_azevedo.Gerenciador_Tarefas.models.Usuario;
@@ -38,11 +37,7 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
     
     @Autowired
     private UsuarioRepository usuarioRepository;
-    
-    @Value("${image.upload.dir}")
-    private String uploadImagemDir;
-    
-
+ 
 
     @Override
     public String saveImage(UsuarioRecordDto usuarioRecordDto, String uploadImadeDir, MultipartFile arquivo) {
@@ -74,7 +69,7 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
     }
 
     @Override
-    public UsuarioRecordDto save(UsuarioRecordDto usuarioRecordDto, MultipartFile arquivo, String fileNome) {
+    public UsuarioRecordDto save(UsuarioRecordDto usuarioRecordDto, String fileNome) {
         Usuario usuario = new Usuario();
         if (usuarioRepository.existsByApelido(usuarioRecordDto.getApelido())) {
             throw new ApelidoExistenteException();
@@ -101,32 +96,10 @@ public class UsuarioServiceImpl implements UsuarioServiceInterface {
 
     @Override
     @Transactional
-    public UsuarioRecordDto update(UsuarioRecordDto usuarioRecordDto, String apelidoAntigo, MultipartFile arquivo) {
-        Path uploadImagemPath = Paths.get(uploadImagemDir);
-        if (uploadImagemDir == null || uploadImagemDir.isBlank()) {
-            throw new CaminhoImagemNullException();
-        }
-        if (!Files.exists(uploadImagemPath)) {
-            try {
-                Files.createDirectories(uploadImagemPath);
-            } catch (IOException e) {
-                throw new DiretorioNaoCriadoException(e.getMessage());
-            }
-        }
-        String originalFileName = arquivo.getOriginalFilename();
-        String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy");
-        String timestamp = LocalDateTime.now().format(formatter);
-        String fileNome = usuarioRecordDto.getApelido() + "_" + timestamp + fileExtension;
-        Path filePath = uploadImagemPath.resolve(fileNome);
-        try {
-            arquivo.transferTo(filePath);
-        } catch (IOException e) {
-            throw new ImagemNaoSalvaException(e.getMessage());
-        }
+    public UsuarioRecordDto update(UsuarioRecordDto usuarioRecordDto, String apelidoAntigo, String fileNome) {
+        
         Usuario usuario = usuarioRepository.findByApelidoNative(apelidoAntigo)
                 .orElseThrow(() -> new UsuarioNaoAchadoException());
-        /////validacoes:
         if (usuarioRepository.existsByApelido(usuarioRecordDto.getApelido())) {
             throw new ApelidoExistenteException();
         }

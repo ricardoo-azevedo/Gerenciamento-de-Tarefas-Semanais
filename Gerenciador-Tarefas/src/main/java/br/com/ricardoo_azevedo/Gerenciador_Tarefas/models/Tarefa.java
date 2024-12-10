@@ -1,6 +1,5 @@
 package br.com.ricardoo_azevedo.Gerenciador_Tarefas.models;
 
-import java.security.Timestamp;
 import java.sql.Time;
 import java.util.Date;
 import java.util.HashSet;
